@@ -1,0 +1,63 @@
+---
+title: "test-webr-dashboard"
+author: "Barkamian Analytics"
+format: html
+filters: 
+  - shinylive
+---
+
+
+```{shinylive-r}
+#| standalone: true
+#| viewerHeight: 600
+library(ggplot2)
+library(dplyr)
+library(DT)
+library(shiny)
+library(bslib)
+library(readr)
+
+
+# Define UI for app that draws a histogram ----
+ui <- page_sidebar(
+  sidebar = 
+    sidebar(open = "open",
+            selectInput("source_type",
+                        "Source:",
+                        c("Agriculture" = "Agriculture",
+                          "Urban" = "Urban"),
+                        selected = "Agriculture")
+
+  ),
+  #plotOutput("plot", width=1100),
+  card(dataTableOutput("table",
+                  width = "100%"))
+)
+
+server <- function(input, output, session) {
+  
+  df <- readr::read_csv("https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv", 
+                        col_types = readr::cols(
+                          ValueID = readr::col_character(), 
+                          StudyID = readr::col_character(), 
+                          BMP_ID = readr::col_character()))
+  filt_data <- reactive({
+    df |> 
+      dplyr::filter(Source_Type == input$source_type)
+  })
+  
+  output$plot <- renderPlot({
+    ggplot(data = filt_data(),
+           aes(Pre, Post)) +
+      geom_point()
+
+  })
+  
+  #output$table <- renderTable(filt_data())
+  output$table <-DT::renderDataTable(filt_data())
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)
+
+```

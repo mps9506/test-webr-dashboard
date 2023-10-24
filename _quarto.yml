@@ -1,0 +1,8 @@
+project:
+  title: "test-webr-dashboard"
+  type: website
+  resources: 
+    - shinylive-sw.js
+
+
+
