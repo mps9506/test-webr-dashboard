@@ -12,7 +12,6 @@ filters:
 #| viewerHeight: 600
 library(ggplot2)
 library(dplyr)
-library(DT)
 library(shiny)
 library(bslib)
 library(readr)
@@ -30,8 +29,7 @@ ui <- page_sidebar(
 
   ),
   #plotOutput("plot", width=1100),
-  card(dataTableOutput("table",
-                  width = "100%"))
+  verbatimTextOutput("summary")
 )
 
 server <- function(input, output, session) {
@@ -53,8 +51,9 @@ server <- function(input, output, session) {
 
   })
   
-  #output$table <- renderTable(filt_data())
-  output$table <-DT::renderDataTable(filt_data())
+  output$summary <- shiny::renderText({ 
+    summary(filt_data())
+  })
 }
 
 # Create Shiny app ----
