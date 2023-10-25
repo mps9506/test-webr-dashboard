@@ -163,7 +163,7 @@ server &lt;- function(input, output) {
   
   ## choose variables and fit lm
   model_output &lt;- reactive({
-    df[df$BMP_SubCat == input$subcat,]
+    model_data &lt;- df[df$BMP_SubCat == input$subcat,]
     m1 &lt;- lm(log(Post) ~ log(Pre),
              data = model_data)
     m1
