@@ -19,15 +19,17 @@ filters:
 #| standalone: true
 #| viewerHeight: 800
 library(shiny)
+library(bslib)
 library(palmerpenguins)
 
 ui <- page_sidebar(
-  selectInput("variable",
-            "Variable:",
-            c("Species" = "species",
-              "Island" = "island",
-              "Bill Length" = "bill_length_mm"),
-            selected = "species"),
+  sidebar = sidebar(
+    selectInput("variable",
+                "Variable:",
+                c("Species" = "species",
+                  "Island" = "island",
+                  "Bill Length" = "bill_length_mm"),
+                selected = "species")),
   renderText("summary")
   
 )
@@ -39,7 +41,7 @@ server <- function(input, output) {
     penguins[[input$variable]]
   })
   output$summary <- shiny::renderText({ 
-    summary(penguin_data())
+    summary(x())
   })
   
 }
