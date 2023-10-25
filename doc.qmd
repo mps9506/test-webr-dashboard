@@ -20,16 +20,16 @@ filters:
 #| viewerHeight: 800
 library(shiny)
 library(bslib)
-library(palmerpenguins)
 
 ui <- page_sidebar(
   sidebar = sidebar(
     selectInput("variable",
                 "Variable:",
-                c("Species" = "species",
-                  "Island" = "island",
-                  "Bill Length" = "bill_length_mm"),
-                selected = "species")),
+                c("Year" = "Pub_Year",
+                  "Parameter" = "Parameter",
+                  "Source Type" = "Source_Type",
+                  "BMP Category" = "BMP_Category"),
+                selected = "Pub_Year")),
   verbatimTextOutput("summary",
                      placeholder = TRUE)
   
@@ -37,9 +37,9 @@ ui <- page_sidebar(
 
 
 server <- function(input, output) {
-  
+  df <- read.csv("https://raw.githubusercontent.com/mps9506/test-webr-dashboard/main/data/data.csv")
   x <- reactive({
-    penguins[[input$variable]]
+    df[[input$variable]]
   })
   output$summary <- renderPrint({ 
     summary(x())
