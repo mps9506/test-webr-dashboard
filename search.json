@@ -1,7 +1,7 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
+    "objectID": "doc.html",
+    "href": "doc.html",
     "title": "test-webr-dashboard",
     "section": "",
     "text": "#| standalone: true\n#| viewerHeight: 800\nlibrary(shiny)\nlibrary(dplyr)\nlibrary(readr)\n\n\nui &lt;- page_sidebar(\n  selectInput(\"source_type\",\n            \"Source:\",\n            c(\"Agriculture\" = \"Agriculture\",\n              \"Urban\" = \"Urban\"),\n            selected = \"Agriculture\"),\n  renderText(\"summary\")\n  \n)\n\n\nserver &lt;- function(input, output) {\n\n  df &lt;- readr::read_csv(\"https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv\", \n                      col_types = readr::cols(\n                        ValueID = readr::col_character(), \n                        StudyID = readr::col_character(), \n                        BMP_ID = readr::col_character()))\n\n  \n  filt_data &lt;- reactive({\n    df |&gt; \n      dplyr::filter(Source_Type == input$source_type)\n  })\n  \n  output$summary &lt;- shiny::renderText({ \n    summary(filt_data())\n  })\n  \n}\n\nshinyApp(ui = ui, server = server)"
