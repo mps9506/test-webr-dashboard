@@ -1,9 +1,0 @@
-[
-  {
-    "objectID": "doc.html",
-    "href": "doc.html",
-    "title": "test-webr-dashboard",
-    "section": "",
-    "text": "#| standalone: true\n#| viewerHeight: 600\nlibrary(ggplot2)\nlibrary(dplyr)\nlibrary(DT)\nlibrary(shiny)\nlibrary(bslib)\nlibrary(readr)\n\n\n# Define UI for app that draws a histogram ----\nui &lt;- page_sidebar(\n  sidebar = \n    sidebar(open = \"open\",\n            selectInput(\"source_type\",\n                        \"Source:\",\n                        c(\"Agriculture\" = \"Agriculture\",\n                          \"Urban\" = \"Urban\"),\n                        selected = \"Agriculture\")\n\n  ),\n  #plotOutput(\"plot\", width=1100),\n  card(dataTableOutput(\"table\",\n                  width = \"100%\"))\n)\n\nserver &lt;- function(input, output, session) {\n  \n  df &lt;- readr::read_csv(\"https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv\", \n                        col_types = readr::cols(\n                          ValueID = readr::col_character(), \n                          StudyID = readr::col_character(), \n                          BMP_ID = readr::col_character()))\n  filt_data &lt;- reactive({\n    df |&gt; \n      dplyr::filter(Source_Type == input$source_type)\n  })\n  \n  output$plot &lt;- renderPlot({\n    ggplot(data = filt_data(),\n           aes(Pre, Post)) +\n      geom_point()\n\n  })\n  \n  #output$table &lt;- renderTable(filt_data())\n  output$table &lt;-DT::renderDataTable(filt_data())\n}\n\n# Create Shiny app ----\nshinyApp(ui = ui, server = server)"
-  }
-]
