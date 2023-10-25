@@ -17,14 +17,13 @@ filters:
 
 ```{shinylive-r}
 #| standalone: true
-
-
-library(dplyr)
+#| viewerHeight: 800
 library(shiny)
+library(dplyr)
 library(readr)
 
 
-ui <- fluidPage(
+ui <- page_sidebar(
   selectInput("source_type",
             "Source:",
             c("Agriculture" = "Agriculture",
