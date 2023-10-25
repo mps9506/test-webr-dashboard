@@ -46,7 +46,7 @@ server <- function(input, output) {
   
   model_output <- reactive({
     model_data <- df[df$BMP_SubCat == input$variable,]
-    model_data <- model_data[!is.na(model_data$Pre) & !is.na(model_data$Post)]
+    model_data <- model_data[!is.na(model_data$Pre) & !is.na(model_data$Post),]
     m1 <- lm(log(Post) ~ log(Pre),
              data = model_data)
     m1
