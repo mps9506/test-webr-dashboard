@@ -109,13 +109,16 @@ library(bslib)
 
 ui &lt;- page_sidebar(
   sidebar = sidebar(
-    selectInput("variable",
-                "Variable:",
-                c("Year" = "Pub_Year",
-                  "Parameter" = "Parameter",
-                  "Source Type" = "Source_Type",
-                  "BMP Category" = "BMP_Category"),
-                selected = "Pub_Year")),
+    selectInput("subcat",
+                "BMP Category:",
+                c("Row crop field" = "Cropland",
+                  "Detention" = "Detention",
+                  "Drainage" = "Drainage",
+                  "Filtration" = "Filtration",
+                  "Infiltration" = "Infiltration",
+                  "Livestock" = "Livestock",
+                  "Treatment" = "Treatment"),
+                selected = "Livestock")),
   verbatimTextOutput("summary",
                      placeholder = TRUE)
   
@@ -124,12 +127,20 @@ ui &lt;- page_sidebar(
 
 server &lt;- function(input, output) {
   df &lt;- read.csv("https://raw.githubusercontent.com/mps9506/test-webr-dashboard/main/data/data.csv")
-  x &lt;- reactive({
-    df[[input$variable]]
+  df$BMP_SubCat &lt;- as.factor(df$BMP_SubCat)
+  
+  
+  model_output &lt;- reactive({
+    model_data &lt;- df[df$BMP_SubCat == input$variable,]
+    model_data &lt;- model_data[!is.na(model_data$Pre) &amp; !is.na(model_data$Post)]
+    m1 &lt;- lm(log(Post) ~ log(Pre),
+             data = model_data)
+    m1
   })
   output$summary &lt;- renderPrint({ 
-    summary(x())
+    summary(model_output())
   })
+  
   
 }
 
