@@ -1,5 +1,5 @@
 project:
-  title: "test-webr-dashboard"
+  title: "index"
   type: website
   resources: 
     - shinylive-sw.js
