@@ -8,7 +8,7 @@
 
 <meta name="author" content="Barkamian Analytics">
 
-<title>index - test-webr-dashboard</title>
+<title>test-webr-dashboard</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -103,14 +103,13 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 <pre class="shinylive-r" data-engine="r"><code>#| standalone: true
-
-
-library(dplyr)
+#| viewerHeight: 800
 library(shiny)
+library(dplyr)
 library(readr)
 
 
-ui &lt;- fluidPage(
+ui &lt;- page_sidebar(
   selectInput("source_type",
             "Source:",
             c("Agriculture" = "Agriculture",
