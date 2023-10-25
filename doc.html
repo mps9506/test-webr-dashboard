@@ -158,13 +158,12 @@ server &lt;- function(input, output) {
                                 "X..Reduction" = "NULL",
                                 "Log.Ratio" = "NULL"),
                  row.names = NULL)
+  df &lt;- df[!is.na(df$Pre) &amp; !is.na(df$Post),]
 
   
   ## choose variables and fit lm
   model_output &lt;- reactive({
-    model_data &lt;- df[df$BMP_SubCat == input$variable,]
-    model_data &lt;- model_data[!is.na(model_data$Pre) &amp; !is.na(model_data$Post),]
-    model_data
+    df[df$BMP_SubCat == input$variable,]
     # m1 &lt;- lm(log(Post) ~ log(Pre),
     #          data = model_data)
     # m1
