@@ -132,7 +132,7 @@ server &lt;- function(input, output) {
   
   model_output &lt;- reactive({
     model_data &lt;- df[df$BMP_SubCat == input$variable,]
-    model_data &lt;- model_data[!is.na(model_data$Pre) &amp; !is.na(model_data$Post)]
+    model_data &lt;- model_data[!is.na(model_data$Pre) &amp; !is.na(model_data$Post),]
     m1 &lt;- lm(log(Post) ~ log(Pre),
              data = model_data)
     m1
