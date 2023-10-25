@@ -116,7 +116,8 @@ ui &lt;- page_sidebar(
                   "Island" = "island",
                   "Bill Length" = "bill_length_mm"),
                 selected = "species")),
-  renderText("summary")
+  verbatimTextOutput("summary",
+                     placeholder = TRUE)
   
 )
 
@@ -126,7 +127,7 @@ server &lt;- function(input, output) {
   x &lt;- reactive({
     penguins[[input$variable]]
   })
-  output$summary &lt;- shiny::renderText({ 
+  output$summary &lt;- renderPrint({ 
     summary(x())
   })
   

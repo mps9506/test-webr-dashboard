@@ -4,6 +4,6 @@
     "href": "doc.html",
     "title": "test-webr-dashboard",
     "section": "",
-    "text": "#| standalone: true\n#| viewerHeight: 800\nlibrary(shiny)\nlibrary(bslib)\nlibrary(palmerpenguins)\n\nui &lt;- page_sidebar(\n  sidebar = sidebar(\n    selectInput(\"variable\",\n                \"Variable:\",\n                c(\"Species\" = \"species\",\n                  \"Island\" = \"island\",\n                  \"Bill Length\" = \"bill_length_mm\"),\n                selected = \"species\")),\n  renderText(\"summary\")\n  \n)\n\n\nserver &lt;- function(input, output) {\n  \n  x &lt;- reactive({\n    penguins[[input$variable]]\n  })\n  output$summary &lt;- shiny::renderText({ \n    summary(x())\n  })\n  \n}\n\nshinyApp(ui = ui, server = server)"
+    "text": "#| standalone: true\n#| viewerHeight: 800\nlibrary(shiny)\nlibrary(bslib)\nlibrary(palmerpenguins)\n\nui &lt;- page_sidebar(\n  sidebar = sidebar(\n    selectInput(\"variable\",\n                \"Variable:\",\n                c(\"Species\" = \"species\",\n                  \"Island\" = \"island\",\n                  \"Bill Length\" = \"bill_length_mm\"),\n                selected = \"species\")),\n  verbatimTextOutput(\"summary\",\n                     placeholder = TRUE)\n  \n)\n\n\nserver &lt;- function(input, output) {\n  \n  x &lt;- reactive({\n    penguins[[input$variable]]\n  })\n  output$summary &lt;- renderPrint({ \n    summary(x())\n  })\n  \n}\n\nshinyApp(ui = ui, server = server)"
   }
 ]
