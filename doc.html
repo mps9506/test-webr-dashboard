@@ -107,7 +107,10 @@ ul.task-list li input[type="checkbox"] {
 library(shiny)
 library(bslib)
 
+
+
 ui &lt;- page_sidebar(
+  ## input selection
   sidebar = sidebar(
     selectInput("subcat",
                 "BMP Category:",
@@ -119,6 +122,7 @@ ui &lt;- page_sidebar(
                   "Livestock" = "Livestock",
                   "Treatment" = "Treatment"),
                 selected = "Livestock")),
+  ## shows rendered output from shiny server
   verbatimTextOutput("summary",
                      placeholder = TRUE)
   
@@ -126,17 +130,47 @@ ui &lt;- page_sidebar(
 
 
 server &lt;- function(input, output) {
-  df &lt;- read.csv("https://raw.githubusercontent.com/mps9506/test-webr-dashboard/main/data/data.csv")
-  df$BMP_SubCat &lt;- as.factor(df$BMP_SubCat)
   
+  ## read data
+  df &lt;- read.csv("https://raw.githubusercontent.com/mps9506/test-webr-dashboard/main/data/data.csv",
+                 colClasses = c("ValueID" = "character",
+                                "StudyID" = "character",
+                                "Pub_Year" = "factor",
+                                "Parameter" = "factor",
+                                "Source" = "factor",
+                                "Source_Type" = "factor",
+                                "BMP" = "factor",
+                                "BMP_ID" = "factor",
+                                "BMP_Class" = "factor",
+                                "BMP_Subcat" = "factor",
+                                "BMP_Category" = "factor",
+                                "Scale" = "factor",
+                                "Location" = "character",
+                                "State" = "factor",
+                                "Area" = "numeric",
+                                "Latitude" = "numeric",
+                                "Longitude" = "character",
+                                "Data_Year" = "character",
+                                "n" = "integer", 
+                                "Pre" = "numeric",
+                                "Post" = "numeric",
+                                "Unit" = "character",
+                                "X..Reduction" = "NULL",
+                                "Log.Ratio" = "NULL"),
+                 row.names = NULL)
+
   
+  ## choose variables and fit lm
   model_output &lt;- reactive({
     model_data &lt;- df[df$BMP_SubCat == input$variable,]
     model_data &lt;- model_data[!is.na(model_data$Pre) &amp; !is.na(model_data$Post),]
-    m1 &lt;- lm(log(Post) ~ log(Pre),
-             data = model_data)
-    m1
+    model_data
+    # m1 &lt;- lm(log(Post) ~ log(Pre),
+    #          data = model_data)
+    # m1
   })
+  
+  ## render model summary output
   output$summary &lt;- renderPrint({ 
     summary(model_output())
   })
