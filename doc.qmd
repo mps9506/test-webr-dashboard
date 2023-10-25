@@ -72,13 +72,12 @@ server <- function(input, output) {
                                 "X..Reduction" = "NULL",
                                 "Log.Ratio" = "NULL"),
                  row.names = NULL)
+  df <- df[!is.na(df$Pre) & !is.na(df$Post),]
 
   
   ## choose variables and fit lm
   model_output <- reactive({
-    model_data <- df[df$BMP_SubCat == input$variable,]
-    model_data <- model_data[!is.na(model_data$Pre) & !is.na(model_data$Post),]
-    model_data
+    df[df$BMP_SubCat == input$variable,]
     # m1 <- lm(log(Post) ~ log(Pre),
     #          data = model_data)
     # m1
