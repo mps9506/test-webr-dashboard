@@ -18,16 +18,11 @@ filters:
 ```{shinylive-r}
 #| standalone: true
 
-library(ggplot2)
+
 library(dplyr)
 library(shiny)
 library(readr)
 
-df <- readr::read_csv("https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv", 
-                      col_types = readr::cols(
-                        ValueID = readr::col_character(), 
-                        StudyID = readr::col_character(), 
-                        BMP_ID = readr::col_character()))
 
 ui <- fluidPage(
   selectInput("source_type",
@@ -42,17 +37,16 @@ ui <- fluidPage(
 
 server <- function(input, output) {
 
+  df <- readr::read_csv("https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv", 
+                      col_types = readr::cols(
+                        ValueID = readr::col_character(), 
+                        StudyID = readr::col_character(), 
+                        BMP_ID = readr::col_character()))
+
   
   filt_data <- reactive({
     df |> 
       dplyr::filter(Source_Type == input$source_type)
-  })
-  
-  output$plot <- renderPlot({
-    ggplot(data = filt_data(),
-           aes(Pre, Post)) +
-      geom_point()
-    
   })
   
   output$summary <- shiny::renderText({ 
