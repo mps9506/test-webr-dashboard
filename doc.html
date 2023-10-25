@@ -105,15 +105,17 @@ ul.task-list li input[type="checkbox"] {
 <pre class="shinylive-r" data-engine="r"><code>#| standalone: true
 #| viewerHeight: 800
 library(shiny)
+library(bslib)
 library(palmerpenguins)
 
 ui &lt;- page_sidebar(
-  selectInput("variable",
-            "Variable:",
-            c("Species" = "species",
-              "Island" = "island",
-              "Bill Length" = "bill_length_mm"),
-            selected = "species"),
+  sidebar = sidebar(
+    selectInput("variable",
+                "Variable:",
+                c("Species" = "species",
+                  "Island" = "island",
+                  "Bill Length" = "bill_length_mm"),
+                selected = "species")),
   renderText("summary")
   
 )
@@ -125,7 +127,7 @@ server &lt;- function(input, output) {
     penguins[[input$variable]]
   })
   output$summary &lt;- shiny::renderText({ 
-    summary(penguin_data())
+    summary(x())
   })
   
 }
