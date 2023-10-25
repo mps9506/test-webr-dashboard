@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Barkamian Analytics">
+<meta name="author" content="Penguin Friend">
 
 <title>test-webr-dashboard</title>
 <style>
@@ -91,7 +91,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Barkamian Analytics </p>
+             <p>Penguin Friend </p>
           </div>
   </div>
     
@@ -105,37 +105,27 @@ ul.task-list li input[type="checkbox"] {
 <pre class="shinylive-r" data-engine="r"><code>#| standalone: true
 #| viewerHeight: 800
 library(shiny)
-library(dplyr)
-library(readr)
-
+library(palmerpenguins)
 
 ui &lt;- page_sidebar(
-  selectInput("source_type",
-            "Source:",
-            c("Agriculture" = "Agriculture",
-              "Urban" = "Urban"),
-            selected = "Agriculture"),
+  selectInput("variable",
+            "Variable:",
+            c("Species" = "species",
+              "Island" = "island",
+              "Bill Length" = "bill_length_mm"),
+            selected = "species"),
   renderText("summary")
   
 )
 
 
 server &lt;- function(input, output) {
-
-  df &lt;- readr::read_csv("https://gist.githubusercontent.com/mps9506/0433bd40ba92b84022e94d619e70999c/raw/099dbd13adfbc5d6da90530a27b200b128c173ad/test_db.csv", 
-                      col_types = readr::cols(
-                        ValueID = readr::col_character(), 
-                        StudyID = readr::col_character(), 
-                        BMP_ID = readr::col_character()))
-
   
-  filt_data &lt;- reactive({
-    df |&gt; 
-      dplyr::filter(Source_Type == input$source_type)
+  x &lt;- reactive({
+    penguins[[input$variable]]
   })
-  
   output$summary &lt;- shiny::renderText({ 
-    summary(filt_data())
+    summary(penguin_data())
   })
   
 }
