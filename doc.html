@@ -107,24 +107,39 @@ ul.task-list li input[type="checkbox"] {
 library(shiny)
 library(bslib)
 
+##functions
+linspace &lt;- function(x1, x2, n = 100) {
+  stopifnot(is.numeric(x1), is.numeric(x2), length(x1) == 1, 
+            length(x2) == 1)
+  n &lt;- floor(n)
+  if (n &lt;= 1) 
+    x2
+  else seq(x1, x2, length.out = n)
+}
 
+logseq &lt;- function(x1, x2, n = 100) {
+    x &lt;- linspace(log(abs(x1)), log(abs(x2)), n)
+    exp(x)
+}
 
 ui &lt;- page_sidebar(
   ## input selection
   sidebar = sidebar(
     selectInput("subcat",
                 "BMP Category:",
-                c("Row crop field" = "Cropland",
+                c("Crop Management" = "Cropland",
                   "Detention" = "Detention",
                   "Drainage" = "Drainage",
                   "Filtration" = "Filtration",
                   "Infiltration" = "Infiltration",
-                  "Livestock" = "Livestock",
+                  "Livestock Management" = "Livestock",
                   "Treatment" = "Treatment"),
                 selected = "Livestock")),
   ## shows rendered output from shiny server
   verbatimTextOutput("summary",
-                     placeholder = TRUE)
+                     placeholder = TRUE),
+  ## shows prediction output
+  tableOutput("preds")
   
 )
 
@@ -159,6 +174,9 @@ server &lt;- function(input, output) {
                                 "Log.Ratio" = "NULL"),
                  row.names = NULL)
   df &lt;- df[!is.na(df$Pre) &amp; !is.na(df$Post),]
+  min_pre &lt;- min(df$Pre, na.rm = TRUE)
+  max_pre &lt;- max(df$Pre, na.rm = TRUE)
+  new_data &lt;- data.frame(Pre = logseq(min_pre, max_pre, n = 100))
 
   
   ## choose variables and fit lm
@@ -169,11 +187,24 @@ server &lt;- function(input, output) {
     m1
   })
   
+  ## generate prediction data and ci
+  model_preds &lt;- reactive({
+    predict(model_output(),
+            newdata = new_data,
+            interval = "confidence",
+            level = 0.90,
+            type = "response")
+  })
+  
   ## render model summary output
   output$summary &lt;- renderPrint({ 
     summary(model_output())
   })
   
+  ## render table out
+  output$preds &lt;- renderTable({
+    model_preds()
+  })
   
 }
 
