@@ -250,9 +250,9 @@ server &lt;- function(input, output) {
                   aes(x = Pre,
                       ymin = lower,
                       ymax = upper),
-                  alpha = 0.5) +
-      scale_x_log10(name = p1_lab()$x) +
-      scale_y_log10(name = p1_lab()$y)
+                  alpha = 0.5) #+
+      # scale_x_log10(name = p1_lab()$x) +
+      # scale_y_log10(name = p1_lab()$y)
   })
 }
 
