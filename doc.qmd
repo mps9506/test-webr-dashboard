@@ -233,7 +233,7 @@ server <- function(input, output, session) {
 #     session$clientData$output_plot2_width
 #   },
 #   res = 100)
-# }
+ }
 
 shinyApp(ui = ui, server = server)
 
