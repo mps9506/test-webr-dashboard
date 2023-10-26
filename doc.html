@@ -143,8 +143,9 @@ ui &lt;- page_sidebar(
   # tableOutput("preds"),
   
   ## plot one
-  plotOutput("plot1",
-             width = "50%")
+  card(
+    plotOutput("plot1")
+  )
   
 )
 
@@ -234,7 +235,7 @@ server &lt;- function(input, output) {
   output$plot1 &lt;- renderPlot({
     model_data() |&gt; 
       ggplot() +
-      geom_points(aes(Pre, Post)) +
+      geom_point(aes(Pre, Post)) +
       scale_x_log10() +
       scale_y_log10()
   })
