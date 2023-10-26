@@ -231,7 +231,7 @@ server &lt;- function(input, output) {
   })
   
   ## render plot
-  out$plot1 &lt;- renderPlot({
+  output$plot1 &lt;- renderPlot({
     model_data() |&gt; 
       ggplot() +
       geom_points(aes(Pre, Post)) +
