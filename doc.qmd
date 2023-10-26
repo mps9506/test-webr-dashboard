@@ -126,11 +126,12 @@ server <- function(input, output) {
   
   ## plot model fits and study estimates
   plot1 <- reactive({
-    lines(model_preds()$Pre,
-          model_preds()$response,
-          log = “xy”)
-    points(model_data()$Pre,
-           model_data()$Post)
+    # lines(model_preds()$Pre,
+    #       model_preds()$response,
+    #       log = “xy”)
+    plot(model_data()$Pre,
+         model_data()$Post,
+         log = "xy")
   })
   
   ## render model summary output
