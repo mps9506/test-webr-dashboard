@@ -21,7 +21,7 @@ filters:
 library(shiny)
 library(bslib)
 library(ggplot2)
-library(ragg)
+
 ## set ggplot2 theme
 theme_set(theme_bw() + theme(plot.title = element_text(face = "bold")))
 
@@ -69,20 +69,20 @@ ui <- page_sidebar(
                   "Infiltration" = "Infiltration",
                   "Livestock Management" = "Livestock",
                   "Treatment" = "Treatment"),
-                selected = "Livestock"),
+                selected = "Livestock")#,
     
-    ## confidence slider
-    sliderInput("ci",
-                "Confidence Intervals:",
-                min = 80,
-                max = 99,
-                value = 90,
-                step = 1)
-    ),
+    # ## confidence slider
+    # sliderInput("ci",
+    #             "Confidence Intervals:",
+    #             min = 80,
+    #             max = 99,
+    #             value = 90,
+    #             step = 1)
+    )#,
   
   ## shows rendered output from shiny server
-  verbatimTextOutput("summary",
-                     placeholder = TRUE),
+  # verbatimTextOutput("summary",
+  #                    placeholder = TRUE)
   # ## shows prediction output
   # tableOutput("preds"),
   
@@ -135,55 +135,55 @@ server <- function(input, output, session) {
   min_pre <- min(df$Pre, na.rm = TRUE)
   max_pre <- max(df$Pre, na.rm = TRUE)
   new_data <- data.frame(Pre = logseq(min_pre, max_pre, n = 100))
-  #critical value from t-dist for 90% ci
-  crit <- reactive({
-    qnorm((1-(input$ci)/100)/2, lower.tail = FALSE) 
-  })
-  
-  ## should seperate model data and model fit here:
-  model_data <- reactive({
-    model_data <- df[df$BMP_SubCat == input$subcat,]
-  })
-  
-  ## fit lm
-  model_output <- reactive({
-    m1 <- lm(log(Post) ~ log(Pre),
-             data = model_data())
-    m1
-  })
-  
-  ## generate prediction data and ci
-  model_preds <- reactive({
-    
-    y <- predict(model_output(),
-                 newdata = new_data,
-                 se.fit = TRUE,
-                 type = "response")
-    y <- cbind(new_data, y)
-    y$response <- exp(y$fit)
-    y$lower <- exp(y$fit-crit()*y$se)
-    y$upper <- exp(y$fit+crit()*y$se)
-    y
-  })
-  
-  ## p1 labels
-  p1_lab <- reactive({
-    if (input$param == "fib") {
-      list(x = "Pre-treatment FIB (cfu/100mL)",
-           y = "Post-Treatment FIB (cfu/100mL)")
-    }
-  })
-  
-  
-  ## render model summary output
-  output$summary <- renderPrint({ 
-    summary(model_output())
-  })
-  
-  ## render table out
-  output$preds <- renderTable({
-    model_preds()
-  })
+  # #critical value from t-dist for 90% ci
+  # crit <- reactive({
+  #   qnorm((1-(input$ci)/100)/2, lower.tail = FALSE) 
+  # })
+  # 
+  # ## should seperate model data and model fit here:
+  # model_data <- reactive({
+  #   model_data <- df[df$BMP_SubCat == input$subcat,]
+  # })
+  # 
+  # ## fit lm
+  # model_output <- reactive({
+  #   m1 <- lm(log(Post) ~ log(Pre),
+  #            data = model_data())
+  #   m1
+  # })
+  # 
+  # ## generate prediction data and ci
+  # model_preds <- reactive({
+  #   
+  #   y <- predict(model_output(),
+  #                newdata = new_data,
+  #                se.fit = TRUE,
+  #                type = "response")
+  #   y <- cbind(new_data, y)
+  #   y$response <- exp(y$fit)
+  #   y$lower <- exp(y$fit-crit()*y$se)
+  #   y$upper <- exp(y$fit+crit()*y$se)
+  #   y
+  # })
+  # 
+  # ## p1 labels
+  # p1_lab <- reactive({
+  #   if (input$param == "fib") {
+  #     list(x = "Pre-treatment FIB (cfu/100mL)",
+  #          y = "Post-Treatment FIB (cfu/100mL)")
+  #   }
+  # })
+  # 
+  # 
+  # ## render model summary output
+  # output$summary <- renderPrint({ 
+  #   summary(model_output())
+  # })
+  # 
+  # ## render table out
+  # output$preds <- renderTable({
+  #   model_preds()
+  # })
   
   
   
