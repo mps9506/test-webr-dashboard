@@ -145,7 +145,7 @@ server <- function(input, output) {
   })
   
   ## render plot
-  out$plot1 <- renderPlot({
+  output$plot1 <- renderPlot({
     model_data() |> 
       ggplot() +
       geom_points(aes(Pre, Post)) +
