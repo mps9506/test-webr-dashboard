@@ -107,6 +107,9 @@ ul.task-list li input[type="checkbox"] {
 library(shiny)
 library(bslib)
 library(ggplot2)
+library(ragg)
+## set ggplot2 theme
+theme_set(theme_bw() + theme(plot.title = element_text(face = "bold")))
 
 ##functions
 linspace &lt;- function(x1, x2, n = 100) {
@@ -119,8 +122,19 @@ linspace &lt;- function(x1, x2, n = 100) {
 }
 
 logseq &lt;- function(x1, x2, n = 100) {
-    x &lt;- linspace(log(abs(x1)), log(abs(x2)), n)
-    exp(x)
+  x &lt;- linspace(log(abs(x1)), log(abs(x2)), n)
+  exp(x)
+}
+
+plot_card &lt;- function(header, ...) {
+  card(
+    full_screen = FALSE,
+    card_header(header, class = "bg-dark"),
+    card_body(...,
+              min_height = "25vh"),
+    max_height = "50vh",
+    fill = FALSE
+  )
 }
 
 ui &lt;- page_sidebar(
@@ -141,7 +155,16 @@ ui &lt;- page_sidebar(
                   "Infiltration" = "Infiltration",
                   "Livestock Management" = "Livestock",
                   "Treatment" = "Treatment"),
-                selected = "Livestock")),
+                selected = "Livestock"),
+    
+    ## confidence slider
+    sliderInput("ci",
+                "Confidence Intervals:",
+                min = 80,
+                max = 99,
+                value = 90,
+                step = 1)
+    ),
   
   ## shows rendered output from shiny server
   verbatimTextOutput("summary",
@@ -150,14 +173,22 @@ ui &lt;- page_sidebar(
   # tableOutput("preds"),
   
   ## plot one
-  card(
-    plotOutput("plot1")
+  
+  layout_columns(
+    plot_card("Regression model",
+              plotOutput("plot1",
+                         height = "30vh",
+                         width = "30vh")),
+    plot_card("Predicted % reduction",
+              plotOutput("plot2",
+                         height = "30vh",
+                         width = "30vh"))
   )
   
 )
 
 
-server &lt;- function(input, output) {
+server &lt;- function(input, output, session) {
   
   ## read data
   df &lt;- read.csv("https://raw.githubusercontent.com/mps9506/test-webr-dashboard/main/data/data.csv",
@@ -191,8 +222,10 @@ server &lt;- function(input, output) {
   max_pre &lt;- max(df$Pre, na.rm = TRUE)
   new_data &lt;- data.frame(Pre = logseq(min_pre, max_pre, n = 100))
   #critical value from t-dist for 90% ci
-  crit &lt;- qnorm(0.05, lower.tail = FALSE) 
-
+  crit &lt;- reactive({
+    qnorm((1-(input$ci)/100)/2, lower.tail = FALSE) 
+  })
+  
   ## should seperate model data and model fit here:
   model_data &lt;- reactive({
     model_data &lt;- df[df$BMP_SubCat == input$subcat,]
@@ -209,13 +242,13 @@ server &lt;- function(input, output) {
   model_preds &lt;- reactive({
     
     y &lt;- predict(model_output(),
-            newdata = new_data,
-            se.fit = TRUE,
-            type = "response")
+                 newdata = new_data,
+                 se.fit = TRUE,
+                 type = "response")
     y &lt;- cbind(new_data, y)
     y$response &lt;- exp(y$fit)
-    y$lower &lt;- exp(y$fit-crit*y$se)
-    y$upper &lt;- exp(y$fit+crit*y$se)
+    y$lower &lt;- exp(y$fit-crit()*y$se)
+    y$upper &lt;- exp(y$fit+crit()*y$se)
     y
   })
   
@@ -226,6 +259,7 @@ server &lt;- function(input, output) {
            y = "Post-Treatment FIB (cfu/100mL)")
     }
   })
+  
   
   ## render model summary output
   output$summary &lt;- renderPrint({ 
@@ -239,10 +273,11 @@ server &lt;- function(input, output) {
   
   
   
-  ## render plot
+  ## render plot 1
   output$plot1 &lt;- renderPlot({
     p1 &lt;- model_data() |&gt; 
       ggplot() +
+      geom_abline(slope = 1, linetype = "dotted", color = "grey30") +
       geom_point(aes(Pre, Post)) +
       geom_line(data = model_preds(),
                 aes(Pre, response)) +
@@ -250,14 +285,43 @@ server &lt;- function(input, output) {
                   aes(x = Pre,
                       ymin = lower,
                       ymax = upper),
-                  alpha = 0.5) #+
-      # scale_x_log10(name = p1_lab()$x) +
-      # scale_y_log10(name = p1_lab()$y)
-  })
+                  alpha = 0.5) +
+      scale_x_log10(name = p1_lab()$x, 
+                    labels = scales::label_log(digits = 1)) +
+      scale_y_log10(name = p1_lab()$y,
+                    labels = scales::label_log(digits = 1)) +
+      coord_fixed(xlim = c(min_pre, max_pre),
+                  ylim = c(min_pre, max_pre))
+    p1
+  },
+  height = function() {
+    session$clientData$output_plot1_width
+  },
+  res = 100)
+  
+  ## render plot2
+  output$plot2 &lt;- renderPlot({
+    p2 &lt;- model_preds() |&gt; 
+      ggplot() +
+      geom_ribbon(aes(Pre, ymin = (Pre-lower)/Pre,
+                      ymax = (Pre-upper)/Pre),
+                  alpha = 0.5) +
+      geom_line(aes(Pre, (Pre-response)/Pre)) +
+      scale_x_log10(name = p1_lab()$x,
+                    labels = scales::label_log(digits = 1)) +
+      scale_y_continuous(name = "Predicted % reduction",
+                         labels = scales::label_percent()) +
+      coord_cartesian()
+    
+    p2
+  },
+  height = function() {
+    session$clientData$output_plot2_width
+  },
+  res = 100)
 }
 
 shinyApp(ui = ui, server = server)
-
 
 </code></pre>
 
