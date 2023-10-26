@@ -139,8 +139,8 @@ ui &lt;- page_sidebar(
   ## shows rendered output from shiny server
   verbatimTextOutput("summary",
                      placeholder = TRUE),
-  ## shows prediction output
-  tableOutput("preds"),
+  # ## shows prediction output
+  # tableOutput("preds"),
   
   ## plot one
   plotOutput("plot1",
@@ -212,13 +212,13 @@ server &lt;- function(input, output) {
   })
   
   ## plot model fits and study estimates
-  plot1 &lt;- reactive({
-    ggplot() +
-      geom_points(data = model_data(),
-                  aes(Pre, Post)) +
-      scale_x_log10() +
-      scale_y_log10()
-  })
+  # plot1 &lt;- reactive({
+  #   ggplot() +
+  #     geom_points(data = model_data(),
+  #                 aes(Pre, Post)) +
+  #     scale_x_log10() +
+  #     scale_y_log10()
+  # })
   
   ## render model summary output
   output$summary &lt;- renderPrint({ 
@@ -232,7 +232,11 @@ server &lt;- function(input, output) {
   
   ## render plot
   out$plot1 &lt;- renderPlot({
-    plot1()
+    model_data() |&gt; 
+      ggplot() +
+      geom_points(aes(Pre, Post)) +
+      scale_x_log10() +
+      scale_y_log10()
   })
 }
 
