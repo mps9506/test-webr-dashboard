@@ -211,14 +211,13 @@ server &lt;- function(input, output) {
   })
   
   ## plot model fits and study estimates
-  plot1 &lt;- reactive({
-    # lines(model_preds()$Pre,
-    #       model_preds()$response,
-    #       log = “xy”)
-    plot(model_data()$Pre,
-         model_data()$Post,
-         log = "xy")
-  })
+  # plot1 &lt;- reactive({
+  #   # lines(model_preds()$Pre,
+  #   #       model_preds()$response,
+  #   #       log = “xy”)
+  #   plot(model_data()$Pre,
+  #        model_data()$Post)
+  # })
   
   ## render model summary output
   output$summary &lt;- renderPrint({ 
@@ -232,7 +231,8 @@ server &lt;- function(input, output) {
   
   ## render plot
   out$plot1 &lt;- renderPlot({
-    plot1()
+    plot(model_data()$Pre,
+         model_data()$Post)
   })
 }
 
