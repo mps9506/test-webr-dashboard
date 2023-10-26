@@ -53,7 +53,7 @@ ui <- page_sidebar(
   verbatimTextOutput("summary",
                      placeholder = TRUE),
   ## shows prediction output
-  tableOutput("preds")
+  tableOutput("preds"),
   
   ## plot one
   plotOutput("plot1",
