@@ -40,6 +40,12 @@ logseq <- function(x1, x2, n = 100) {
 ui <- page_sidebar(
   ## input selection
   sidebar = sidebar(
+    ## parameter selection
+    selectInput("param",
+                "Water Quality Parameter:",
+                c("Fecal Indicator Bacteria" = "fib")),
+    
+    ## subcategory selection
     selectInput("subcat",
                 "BMP Category:",
                 c("Crop Management" = "Cropland",
@@ -50,6 +56,7 @@ ui <- page_sidebar(
                   "Livestock Management" = "Livestock",
                   "Treatment" = "Treatment"),
                 selected = "Livestock")),
+  
   ## shows rendered output from shiny server
   verbatimTextOutput("summary",
                      placeholder = TRUE),
@@ -126,14 +133,13 @@ server <- function(input, output) {
     y
   })
   
-  ## plot model fits and study estimates
-  # plot1 <- reactive({
-  #   ggplot() +
-  #     geom_points(data = model_data(),
-  #                 aes(Pre, Post)) +
-  #     scale_x_log10() +
-  #     scale_y_log10()
-  # })
+  ## p1 labels
+  p1_lab <- reactive({
+    if (input$param == "fib") {
+      list(x = "Pre-treatment FIB (cfu/100mL)",
+           y = "Post-Treatment FIB (cfu/100mL)")
+    }
+  })
   
   ## render model summary output
   output$summary <- renderPrint({ 
@@ -145,13 +151,22 @@ server <- function(input, output) {
     model_preds()
   })
   
+  
+  
   ## render plot
   output$plot1 <- renderPlot({
-    model_data() |> 
+    p1 <- model_data() |> 
       ggplot() +
       geom_point(aes(Pre, Post)) +
-      scale_x_log10() +
-      scale_y_log10()
+      geom_line(data = model_preds(),
+                aes(Pre, response)) +
+      geom_ribbon(data = model_preds(),
+                  aes(x = Pre,
+                      ymin = lower,
+                      ymax = upper),
+                  alpha = 0.5) +
+      scale_x_log10(name = p1_lab()$x) +
+      scale_y_log10(name = p1_lab()$y)
   })
 }
 
