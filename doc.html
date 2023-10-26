@@ -141,6 +141,10 @@ ui &lt;- page_sidebar(
   ## shows prediction output
   tableOutput("preds")
   
+  ## plot one
+  plotOutput("plot1",
+             width = "50%")
+  
 )
 
 
@@ -180,12 +184,15 @@ server &lt;- function(input, output) {
   #critical value from t-dist for 90% ci
   crit &lt;- qnorm(0.05, lower.tail = FALSE) 
 
-  
-  ## choose variables and fit lm
-  model_output &lt;- reactive({
+  ## should seperate model data and model fit here:
+  model_data &lt;- reactive({
     model_data &lt;- df[df$BMP_SubCat == input$subcat,]
+  })
+  
+  ## fit lm
+  model_output &lt;- reactive({
     m1 &lt;- lm(log(Post) ~ log(Pre),
-             data = model_data)
+             data = model_data())
     m1
   })
   
@@ -203,6 +210,15 @@ server &lt;- function(input, output) {
     y
   })
   
+  ## plot model fits and study estimates
+  plot1 &lt;- reactive({
+    lines(model_preds()$Pre,
+          model_preds()$response,
+          log = “xy”)
+    points(model_data()$Pre,
+           model_data()$Post)
+  })
+  
   ## render model summary output
   output$summary &lt;- renderPrint({ 
     summary(model_output())
@@ -213,6 +229,10 @@ server &lt;- function(input, output) {
     model_preds()
   })
   
+  ## render plot
+  out$plot1 &lt;- renderPlot({
+    plot1()
+  })
 }
 
 shinyApp(ui = ui, server = server)
