@@ -57,8 +57,9 @@ ui <- page_sidebar(
   # tableOutput("preds"),
   
   ## plot one
-  plotOutput("plot1",
-             width = "50%")
+  card(
+    plotOutput("plot1")
+  )
   
 )
 
@@ -148,7 +149,7 @@ server <- function(input, output) {
   output$plot1 <- renderPlot({
     model_data() |> 
       ggplot() +
-      geom_points(aes(Pre, Post)) +
+      geom_point(aes(Pre, Post)) +
       scale_x_log10() +
       scale_y_log10()
   })
