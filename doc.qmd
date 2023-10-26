@@ -91,6 +91,8 @@ server <- function(input, output) {
   min_pre <- min(df$Pre, na.rm = TRUE)
   max_pre <- max(df$Pre, na.rm = TRUE)
   new_data <- data.frame(Pre = logseq(min_pre, max_pre, n = 100))
+  #critical value from t-dist for 90% ci
+  crit <- qnorm(0.05, lower.tail = FALSE) 
 
   
   ## choose variables and fit lm
@@ -103,11 +105,16 @@ server <- function(input, output) {
   
   ## generate prediction data and ci
   model_preds <- reactive({
-    predict(model_output(),
+    
+    y <- predict(model_output(),
             newdata = new_data,
-            interval = "confidence",
-            level = 0.90,
+            se.fit = TRUE,
             type = "response")
+    y <- cbind(new_data, y)
+    y$response <- exp(y$fit)
+    y$lower <- exp(y$fit-crit*y$se)
+    y$upper <- exp*(y$fit+crit*y$se)
+    y
   })
   
   ## render model summary output
