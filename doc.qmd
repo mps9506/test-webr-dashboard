@@ -88,16 +88,16 @@ ui <- page_sidebar(
   
   ## plot one
   
-  layout_columns(
-    plot_card("Regression model",
-              plotOutput("plot1",
-                         height = "30vh",
-                         width = "30vh")),
-    plot_card("Predicted % reduction",
-              plotOutput("plot2",
-                         height = "30vh",
-                         width = "30vh"))
-  )
+  # layout_columns(
+  #   plot_card("Regression model",
+  #             plotOutput("plot1",
+  #                        height = "30vh",
+  #                        width = "30vh")),
+  #   plot_card("Predicted % reduction",
+  #             plotOutput("plot2",
+  #                        height = "30vh",
+  #                        width = "30vh"))
+  # )
   
 )
 
@@ -187,53 +187,53 @@ server <- function(input, output, session) {
   
   
   
-  ## render plot 1
-  output$plot1 <- renderPlot({
-    p1 <- model_data() |> 
-      ggplot() +
-      geom_abline(slope = 1, linetype = "dotted", color = "grey30") +
-      geom_point(aes(Pre, Post)) +
-      geom_line(data = model_preds(),
-                aes(Pre, response)) +
-      geom_ribbon(data = model_preds(),
-                  aes(x = Pre,
-                      ymin = lower,
-                      ymax = upper),
-                  alpha = 0.5) +
-      scale_x_log10(name = p1_lab()$x, 
-                    labels = scales::label_log(digits = 1)) +
-      scale_y_log10(name = p1_lab()$y,
-                    labels = scales::label_log(digits = 1)) +
-      coord_fixed(xlim = c(min_pre, max_pre),
-                  ylim = c(min_pre, max_pre))
-    p1
-  },
-  height = function() {
-    session$clientData$output_plot1_width
-  },
-  res = 100)
-  
-  ## render plot2
-  output$plot2 <- renderPlot({
-    p2 <- model_preds() |> 
-      ggplot() +
-      geom_ribbon(aes(Pre, ymin = (Pre-lower)/Pre,
-                      ymax = (Pre-upper)/Pre),
-                  alpha = 0.5) +
-      geom_line(aes(Pre, (Pre-response)/Pre)) +
-      scale_x_log10(name = p1_lab()$x,
-                    labels = scales::label_log(digits = 1)) +
-      scale_y_continuous(name = "Predicted % reduction",
-                         labels = scales::label_percent()) +
-      coord_cartesian()
-    
-    p2
-  },
-  height = function() {
-    session$clientData$output_plot2_width
-  },
-  res = 100)
-}
+#   ## render plot 1
+#   output$plot1 <- renderPlot({
+#     p1 <- model_data() |> 
+#       ggplot() +
+#       geom_abline(slope = 1, linetype = "dotted", color = "grey30") +
+#       geom_point(aes(Pre, Post)) +
+#       geom_line(data = model_preds(),
+#                 aes(Pre, response)) +
+#       geom_ribbon(data = model_preds(),
+#                   aes(x = Pre,
+#                       ymin = lower,
+#                       ymax = upper),
+#                   alpha = 0.5) +
+#       scale_x_log10(name = p1_lab()$x, 
+#                     labels = scales::label_log(digits = 1)) +
+#       scale_y_log10(name = p1_lab()$y,
+#                     labels = scales::label_log(digits = 1)) +
+#       coord_fixed(xlim = c(min_pre, max_pre),
+#                   ylim = c(min_pre, max_pre))
+#     p1
+#   },
+#   height = function() {
+#     session$clientData$output_plot1_width
+#   },
+#   res = 100)
+#   
+#   ## render plot2
+#   output$plot2 <- renderPlot({
+#     p2 <- model_preds() |> 
+#       ggplot() +
+#       geom_ribbon(aes(Pre, ymin = (Pre-lower)/Pre,
+#                       ymax = (Pre-upper)/Pre),
+#                   alpha = 0.5) +
+#       geom_line(aes(Pre, (Pre-response)/Pre)) +
+#       scale_x_log10(name = p1_lab()$x,
+#                     labels = scales::label_log(digits = 1)) +
+#       scale_y_continuous(name = "Predicted % reduction",
+#                          labels = scales::label_percent()) +
+#       coord_cartesian()
+#     
+#     p2
+#   },
+#   height = function() {
+#     session$clientData$output_plot2_width
+#   },
+#   res = 100)
+# }
 
 shinyApp(ui = ui, server = server)
 
