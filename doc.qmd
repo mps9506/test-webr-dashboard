@@ -113,7 +113,7 @@ server <- function(input, output) {
     y <- cbind(new_data, y)
     y$response <- exp(y$fit)
     y$lower <- exp(y$fit-crit*y$se)
-    y$upper <- exp*(y$fit+crit*y$se)
+    y$upper <- exp(y$fit+crit*y$se)
     y
   })
   
