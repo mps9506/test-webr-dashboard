@@ -94,12 +94,15 @@ server <- function(input, output) {
   #critical value from t-dist for 90% ci
   crit <- qnorm(0.05, lower.tail = FALSE) 
 
-  
-  ## choose variables and fit lm
-  model_output <- reactive({
+  ## should seperate model data and model fit here:
+  model_data <- reactive({
     model_data <- df[df$BMP_SubCat == input$subcat,]
+  })
+  
+  ## fit lm
+  model_output <- reactive({
     m1 <- lm(log(Post) ~ log(Pre),
-             data = model_data)
+             data = model_data())
     m1
   })
   
@@ -116,6 +119,8 @@ server <- function(input, output) {
     y$upper <- exp(y$fit+crit*y$se)
     y
   })
+  
+  ## plot model fits and study estimates
   
   ## render model summary output
   output$summary <- renderPrint({ 
